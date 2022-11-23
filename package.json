@@ -1,0 +1,8 @@
+{
+  "name": "yarn-berry-workspace-test",
+  "packageManager": "yarn@3.3.0",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ]
+}
