@@ -1,0 +1,7 @@
+{
+  "name": "@wanted/lib",
+  "private": true,
+  "dependencies": {
+    "typescript": "^4.9.3"
+  }
+}
