@@ -72,6 +72,14 @@ module.exports = {
       },
     ],
 
+    'import/order': [
+      'error',
+      {
+        groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index', 'object'],
+        alphabetize: { order: 'asc', caseInsensitive: true },
+      },
+    ],
+
     'react/prop-types': 'off',
     // React.memo, React.forwardRef에서 사용하는 경우도 막고 있어서
     'react/display-name': 'off',
