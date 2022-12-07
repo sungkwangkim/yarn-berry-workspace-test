@@ -63,16 +63,31 @@ https://yarnpkg.com/cli/init
 
 
 ## 4. apps 폴더에 create next-app 프로젝트 추가
+
 ```shell
 // 1. create-next-app 프로젝트 생성
 cd apps
 yarn create next-app
+```
+<br />
+저는 아래와 같이 셋팅 하였습니다.
 
-// 2. pacakge.json 수정
+
+![스크린샷 2022-12-07 10 44 06](https://user-images.githubusercontent.com/61961190/206067170-13d7b771-9ee4-4d96-93a5-45549cad00ec.png)
 
 
+
+2. pacakge.json 수정
+name을 `@wanted/web`으로 변경
+![스크린샷 2022-12-07 10 45 09](https://user-images.githubusercontent.com/61961190/206067328-b73412f1-7de9-4928-96d8-b4b846834350.png)
+
+
+
+
+```shell
 // 3. root가서 상태 갱신하기
-cd ../../
+
+cd ..
 yarn
 
 
@@ -94,7 +109,6 @@ yarn berry는 npm과 모듈을 불러오는 방식이 다르기 때문에 생기
 
 ```shell
 yarn add -D typescript
-yarn dlx @yarnpkg/sdks typescript
 yarn dlx @yarnpkg/sdks vscode
 ```
 
@@ -104,8 +118,8 @@ yarn dlx @yarnpkg/sdks vscode
 
 
 ## 6. yarn PnP 사용을 위한 vscode extension 설치 `arcanis.vscode-zipfs`
-![스크린샷 2022-12-06 17 01 58](https://user-images.githubusercontent.com/61961190/205854462-dbc96268-accf-4561-8e44-f3a1ef16dd22.png)
 
+이미 추가 되어 있다면 skip 합니다.
 
 ### `.vscode/extensions.json`에 추가
 ```json
@@ -125,41 +139,113 @@ yarn dlx @yarnpkg/sdks vscode
 
 
 
-## 7. pacakges/lib 만들어 apps/wanted에서 사용해 보기!
+## 7. pacakges/lib 공통 패키지를 만들어보기
 
-[ea1a826f-42c5-46f0-8755-9cd047efc047](https://user-images.githubusercontent.com/61961190/205856029-639cfa2f-db0b-42ab-ae90-1b56425ff88e.png)
-
-
-`./apps/watend`에 의존성 주입
+`packages/lib` 폴더 생성하고, 아래 스크립트를 실행한다.
 
 ```shell
-yarn workspace @wanted/web add @wanted/lib
+// lib 폴더 이동
+cd packages/lib
+
+// pacakge.json 파일 생성
+yarn init
 ```
 
-![dadd0545-744d-498e-acc3-a15db42f11d6](https://user-images.githubusercontent.com/61961190/205856200-8c3613de-b998-41ad-bbb3-58a34abb44f2.png)
-의존성 확인
+<br /><br />
 
 
-### `.apps/wanted/pages/index.tsx` 에서 사용해보면 에러가 발생!
+아래와 같이`packages/lib/package.json` 파일 수정한다.
+```json
+{
+  "name": "@wanted/lib",
+  "version": "1.0.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "dependencies": {
+    "typescript": "^4.9.3"
+  }
+}
 
+```
 
-![8489c8ea-ae2f-45df-a1e0-c51385026593](https://user-images.githubusercontent.com/61961190/205856731-e0f6ea30-fb91-422a-a967-8f643f5e7996.png)
+<br /><br />
 
-
-`./apps/wanted/tsconfig.json` path 설정 필요.
-
+`packages/lib/tsconfig.json` 파일 생성 후 설정값 넣기
 ```json
 {
   "$schema": "https://json.schemastore.org/tsconfig",
   "compilerOptions": {
-    ...
-    "paths": {
-      "@wanted/lib": ["../../packages/lib/src/index"]
-    }
+    "strict": true,
+    "useUnknownInCatchVariables": true,
+    "allowJs": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "newLine": "lf",
+    "module": "ESNext",
+    "moduleResolution": "node",
+    "target": "ESNext",
+    "lib": ["ESNext", "dom"],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": "./src",
+    "noEmit": false,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "paths": {}
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules"]
+  "exclude": ["**/node_modules", "**/.*/", "./dist", "./coverage"],
+  "include": ["**/*.ts", "**/*.js", "**/.cjs", "**/*.mjs", "**/*.json"]
 }
 ```
 
+<br /><br />
+
+`packages/lib/src/index.ts` 파일 생성하기 하고 간단한 코드 넣는다.
+```typescript
+export const sayHello = () => {
+   console.log("hello from lib");
+   return "hello from lib";
+};
+```
+
+<br /><br /><br />
+
+
+
+## 8. `apps/wanted`에서 `pacakges/lib` 의존해 보기
+
+`apps/wanted`에 의존성 주입
+
+```shell
+// root로 이동한다.
+cd ../../
+
+// root 실행한다.
+yarn workspace @wanted/web add @wanted/lib
+```
+
+`apps/wanted/package.json`에 의존성이 추가된 것을 확인 합니다.
+
+![dadd0545-744d-498e-acc3-a15db42f11d6](https://user-images.githubusercontent.com/61961190/205856200-8c3613de-b998-41ad-bbb3-58a34abb44f2.png)
+
+
+
+## 9. `apps/wanted/pages/index.tsx` 파일에서 @wanted/lib 사용해보기
+`@wanted/lib`에 `sayHello` 함수를 호출해 봅니다.
+![스크린샷 2022-12-07 10 51 52](https://user-images.githubusercontent.com/61961190/206068252-776b4334-ec61-400b-b9b0-4111bbb3b2af.png)
+
+
+그리고, @wanted/web을 구동해 봅니다.
+
+```shell
+yarn workspace @wanted/web run dev
+```
+
+<br /><br />
+
+아래와 같이 `hello from lib`이 노출된다면 성공 입니다.
+
+
+![스크린샷 2022-12-07 10 54 39](https://user-images.githubusercontent.com/61961190/206068483-468265ec-c26a-4faa-bbf9-208a06fe8cf6.png)
 
