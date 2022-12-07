@@ -77,8 +77,8 @@ yarn create next-app
 
 
 
-2. pacakge.json 수정
-name을 `@wanted/web`으로 변경
+pacakge.json 수정
+name `@wanted/web`으로 변경
 ![스크린샷 2022-12-07 10 45 09](https://user-images.githubusercontent.com/61961190/206067328-b73412f1-7de9-4928-96d8-b4b846834350.png)
 
 
